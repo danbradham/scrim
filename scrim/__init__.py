@@ -10,4 +10,4 @@ __version__ = '0.0.1'
 
 from .api import *
 from .globals import *
-from utils import *
+from .utils import *
