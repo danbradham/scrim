@@ -6,7 +6,6 @@ from nose.tools import *
 from scrim import *
 
 data_path = partial(os.path.join, os.path.dirname(__file__), '.testdata')
-raise Exception
 
 
 def setup_module():
