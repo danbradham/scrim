@@ -93,7 +93,9 @@ v0.1.0
 
   - Add support for bash, fish, and csh
   - Add commands to the Scrim object that support each shell scripting language.
+
     - Scrim.echo for example would append a Write-Host call to the Scrim for powershell and echo for cmd and bash
+
   - Parse setup.cfg as well as setup.py to find all entry_points
 
 Known Issues
