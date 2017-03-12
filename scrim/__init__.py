@@ -6,7 +6,7 @@ __email__ = 'danielbradham@gmail.com'
 __license__ = 'MIT'
 __url__ = 'https://github.com/danbradham/scrim.git'
 __description__ = 'Opaque Python CLI Wrapper'
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 from .api import *
 from .globals import *

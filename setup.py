@@ -1,14 +1,17 @@
-import os
 import re
 import sys
+from subprocess import check_call
 from setuptools import setup, find_packages
 
 
 if sys.argv[-1] == 'cheeseit!':
-    os.system('python setup.py sdist bdist_wheel upload')
+    check_call('nosetests -v')
+    check_call('python setup.py sdist bdist_wheel')
+    check_call('twine upload /dist*')
     sys.exit()
 elif sys.argv[-1] == 'testit!':
-    os.system('python setup.py sdist bdist_wheel upload -r pypitest')
+    check_call('nosetests -v')
+    check_call('python setup.py sdist bdist_wheel upload -r pypitest')
     sys.exit()
 
 

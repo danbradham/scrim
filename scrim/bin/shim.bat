@@ -6,7 +6,7 @@ set SCRIM_AUTO_WRITE={{auto_write}}
 set SCRIM_SCRIPT=%0
 
 rem Call real python cli
-{{entry_point}} %*
+{{entry_point}}.exe %*
 
 if exist %SCRIM_PATH% (goto :try) else (goto :finally)
 

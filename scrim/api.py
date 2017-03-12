@@ -78,7 +78,7 @@ class Scrim(list):
         if self.path is None:
             raise Exception('Scrims path is None')
 
-        dirname = os.path.dirname(self.path)
+        dirname = os.path.dirname(os.path.abspath(self.path))
         if not os.path.exists(dirname):
             try:
                 os.makedirs(dirname)
