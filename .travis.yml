@@ -6,5 +6,5 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-install: ['psutil', 'click']
+install: ['click']
 script: nosetests -v
