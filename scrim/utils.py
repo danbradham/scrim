@@ -4,6 +4,7 @@ __all__ = [
     'parse_setup', 'get_console_scripts', 'get_parent_process'
 ]
 import os
+import psutil
 from types import ModuleType
 
 this_path = os.path.dirname(__file__)
@@ -55,10 +56,6 @@ def get_parent_process(ok_names, limit=10):
 
     :param ok_names: Return the first one of these processes that we find
     '''
-    try:
-        import psutil
-    except ImportError:
-        raise Exception('get_parent_process relies on psutil...please install')
 
     depth = 0
     this_proc = psutil.Process(os.getpid())

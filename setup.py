@@ -1,22 +1,46 @@
+import os
+import re
+import sys
 from setuptools import setup, find_packages
-import scrim
+
+
+if sys.argv[-1] == 'cheeseit!':
+    os.system('python setup.py sdist bdist_wheel upload')
+    sys.exit()
+elif sys.argv[-1] == 'testit!':
+    os.system('python setup.py sdist bdist_wheel upload -r pypitest')
+    sys.exit()
+
+
+def get_info(pyfile):
+    '''Retrieve dunder values from a pyfile'''
+    info = {}
+    info_re = re.compile(r"^__(\w+)__ = ['\"](.*)['\"]")
+    with open(pyfile, 'r') as f:
+        for line in f.readlines():
+            match = info_re.search(line)
+            if match:
+                info[match.group(1)] = match.group(2)
+    return info
+
+info = get_info('scrim/__init__.py')
 
 with open('README.rst', 'r') as f:
     long_description = f.read()
 
 
 setup(
-    name=scrim.__title__,
-    version=scrim.__version__,
-    url=scrim.__url__,
-    license=scrim.__license__,
-    author=scrim.__author__,
-    author_email=scrim.__email__,
-    description=scrim.__description__,
+    name=info['title'],
+    version=info['version'],
+    url=info['url'],
+    license=info['license'],
+    author=info['author'],
+    author_email=info['email'],
+    description=info['description'],
     long_description=long_description,
     install_requires=[
         'click>=6.7',
-        'psutil>=5.2',
+        'psutil>=5.2'
     ],
     packages=['scrim'],
     package_data={

@@ -6,5 +6,6 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-install: ['click']
+install:
+  - 'pip install click>=6.7 psutil>=5.2'
 script: nosetests -v
