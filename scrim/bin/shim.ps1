@@ -4,7 +4,7 @@ $env:SCRIM_AUTO_WRITE="{{auto_write}}"
 $env:SCRIM_SCRIPT = $MyInvocation.MyCommand.Definition
 
 # Call the real python cli
-python -m {{entry_point}} $args
+{{entry_point}} $args
 
 if (Test-Path $env:SCRIM_PATH) {
     Try{
