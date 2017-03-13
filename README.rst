@@ -4,7 +4,7 @@ Scrim
 .. image:: https://travis-ci.org/danbradham/scrim.svg?branch=master
     :target: https://travis-ci.org/danbradham/scrim
 
-A *scrim* is a piece of cloth that's opaque until lit from behind. Like a scrim, **Scrim** provides opaque scripts to wrap python command line tools while providing an api to send shell commands up to the users shell.
+A *scrim* is a piece of cloth that's opaque until lit from behind. Like a scrim, **Scrim** provides opaque scripts to wrap python command line tools while providing a transparent python api to send shell commands up to the users shell.
 
 
 Why would I need Scrim?
