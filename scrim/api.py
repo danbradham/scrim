@@ -76,7 +76,7 @@ class Scrim(list):
         '''Write this Scrims commands to its path'''
 
         if self.path is None:
-            raise Exception('Scrims path is None')
+            raise Exception('Scrim.path is None')
 
         dirname = os.path.dirname(os.path.abspath(self.path))
         if not os.path.exists(dirname):

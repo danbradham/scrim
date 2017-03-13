@@ -11,7 +11,6 @@ rem Call real python cli
 if exist %SCRIM_PATH% (goto :try) else (goto :finally)
 
 :try
-echo Try
 call %SCRIM_PATH% 2> %SCRIM_LOG%
 if errorlevel 1 (goto :except) else (goto :finally)
 
@@ -23,7 +22,6 @@ echo %err%
 goto :finally
 
 :finally
-echo Finally
 if exist %SCRIM_PATH% (del %SCRIM_PATH%)
 set SCRIM_SHELL=
 set SCRIM_PATH=
