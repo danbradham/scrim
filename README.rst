@@ -21,7 +21,7 @@ In this diagram the *Scrim Script* is the opaque shell script provided by the sc
   - **SCRIM_SHELL** - name of the shell process (powershell.exe, cmd.exe)
   - **SCRIM_PATH** - path to temp script which python will write
   - **SCRIM_SCRIPT** - full path to the Scrim Script
-  - **SCRIM_AUTO_WRITE** - whether or not to automatically write the temp script which python exits.
+  - **SCRIM_AUTO_WRITE** - whether or not to automatically write the temp script when python exits.
 
 Then the *Scrim Script* invokes the actual *Python CLI* passing all arguments from the *User*. The *Python CLI* can now use the scrim api to append commands to a list. When the python program exits, the list of commands is written to a temporary script file. The *Scrim Script* now continues and executes the temporary script file if it exists. Finally the *Scrim Script* removes any temporary files and unsets the above environment variables.
 
