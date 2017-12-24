@@ -1,13 +1,27 @@
 # -*- coding: utf-8 -*-
+'''
+===========
+scrim.utils
+===========
+'''
+from __future__ import absolute_import
+import io
+import os
+from types import ModuleType
 __all__ = [
     'this_path', 'relative_path', 'bin_path', 'copy_templates',
-    'parse_setup', 'get_console_scripts', 'get_parent_process'
+    'parse_setup', 'get_console_scripts', 'init_attr'
 ]
-import os
-import psutil
-from types import ModuleType
 
 this_path = os.path.dirname(__file__)
+NEWLINE_MAP = {
+    '.ps1': '\r\n',
+    '.bat': '\r\n',
+    '.sh': '\n',
+    '.csh': '\n',
+    '.fish': '\n',
+    '.zsh': '\n',
+}
 
 
 def relative_path(*args):
@@ -22,12 +36,21 @@ def bin_path(*args):
     return os.path.join(this_path, 'bin', *args)
 
 
-def copy_templates(entry_point, auto_write, output_dir):
+def init_attr(value=None, default=None):
+    '''Returns default if value is None'''
+    if value is None:
+        return default
+    return value
+
+
+def copy_templates(entry_point, py_entry_point, auto_write, output_dir):
     '''Copy formatted templates from scrim/bin to output directory
 
-    :param entry_point: Name of python console script
-    :param auto_write: Sets SCRIM_AUTO_WRITE to True
-    :param output_dir: Guess
+    Attributes:
+        entry_point: Name of shell script
+        py_entry_point: Name of python console script
+        auto_write: Sets SCRIM_AUTO_WRITE to True
+        output_dir: Guess
     '''
 
     if not os.path.exists(output_dir):
@@ -36,48 +59,30 @@ def copy_templates(entry_point, auto_write, output_dir):
     scripts = []
     for f in os.listdir(bin_path()):
         ext = os.path.splitext(f)[-1]
+        newline = NEWLINE_MAP.get(ext, '\n')
         template = bin_path(f)
         destination = output_dir + '/' + entry_point + ext
         scripts.append(destination)
 
-        with open(template, 'r') as f:
+        with io.open(template, 'r') as f:
             code = f.read()
         code = code.replace('{{entry_point}}', entry_point)
+        code = code.replace('{{py_entry_point}}', py_entry_point)
         code = code.replace('{{auto_write}}', str(int(auto_write)))
 
-        with open(destination, 'w') as f:
+        with io.open(destination, 'w', newline=newline) as f:
             f.write(code)
 
     return scripts
 
 
-def get_parent_process(ok_names, limit=10):
-    '''Walk up the process tree until we find a process we like.
-
-    :param ok_names: Return the first one of these processes that we find
-    '''
-
-    depth = 0
-    this_proc = psutil.Process(os.getpid())
-    next_proc = parent = psutil.Process(this_proc.ppid())
-    while depth < limit:
-
-        if next_proc.name() in ok_names:
-            return next_proc.name()
-
-        next_proc = psutil.Process(next_proc.ppid())
-        depth += 1
-
-    return parent.name()
-
-
 def parse_setup(filepath):
     '''Get the kwargs from the setup function in setup.py'''
-
-    # TODO Need to also parse setup.cfg and merge with the data from below
+    # TODO: Need to parse setup.cfg and merge with the data from below
 
     # Monkey patch setuptools.setup to capture keyword arguments
     setup_kwargs = {}
+
     def setup_interceptor(**kwargs):
         setup_kwargs.update(kwargs)
 
@@ -97,9 +102,10 @@ def parse_setup(filepath):
 
 
 def get_console_scripts(setup_data):
-    '''Parse and return a list of console_scripts from the setup_data'''
+    '''Parse and return a list of console_scripts from setup_data'''
 
-    # TODO support ini format of entry_points
+    # TODO: support ini format of entry_points
+    # TODO: support setup.cfg entry_points as available in pbr
 
     if 'entry_points' not in setup_data:
         return []

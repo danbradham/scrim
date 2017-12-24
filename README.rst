@@ -4,12 +4,12 @@ Scrim
 .. image:: https://travis-ci.org/danbradham/scrim.svg?branch=master
     :target: https://travis-ci.org/danbradham/scrim
 
-A *scrim* is a piece of cloth that's opaque until lit from behind. Like a scrim, **Scrim** provides opaque scripts to wrap python command line tools while providing a transparent python api to send shell commands up to the users shell.
+A *scrim* is a piece of cloth that's opaque until lit from behind. Like a scrim, **Scrim** provides opaque scripts to wrap python command line tools and a transparent python api to send shell commands up to the user's shell.
 
 
 Why would I need Scrim?
 =======================
-When writing command line tools in python, changes to--let's say--environment variables, don't persist when the python process exits. This means we can't write certain types of tools in pure python, we need to revert to our shell's scripting language instead. That's why clis for tools like virtualenv are written in shell scripting languages instead of pure python. **Scrim** provides opaque shell scripts that wrap your python cli, so you can continue writing the interfaces for your python programs in python.
+When writing command line tools in python, changes to--let's say--environment variables, don't persist when the python process exits. This means we can't write certain types of tools in pure python, we need to revert to our shell's scripting language instead. That's why tools like virtualenvwrapper are written in shell scripting languages instead of pure python. **Scrim** provides opaque shell scripts that wrap your python cli, so you can continue writing the interfaces for your python programs in python.
 
 
 How does it work?
@@ -33,17 +33,19 @@ First add **Scrim** scripts to your project using **Scrim's** cli.
 ::
 
     > cd mytool
-    > scrim add --entry_point mytool
+    > scrim add --entry_point pymytool
 
-    Creating scripts for: mytool
+    Creating scripts for: pymytool
         Created bin/mytool.bat
         Created bin/mytool.ps1
+        Created bin/mytool.sh
 
     Add the following section to your package setup:
 
     scripts=[
         'bin/mytool.bat',
         'bin/mytool.ps1',
+        'bin/mytool.sh'
     ],
 
 Assume that *mytool* is a python project containing a setup.py file. Here we've provided `scrim add` with the name of the entry_point to our python cli. If you've got multiple entry_points already defined in your package you can use::
@@ -53,11 +55,9 @@ Assume that *mytool* is a python project containing a setup.py file. Here we've 
 
 This will add *Scrim Scripts* to each console_script you've defined in entry_points.
 
-You'll notice a limitation in the output above. Currently Scrim only provides scripts for Powershell and Batch. The plan is to provide wrappers for all of the popular shell scripting languages (bash, csh, fish). But, for now...Windows.
-
 Now that you're project has Scrim added to it let's take a look at the python side.
 
-.. code-block:: python
+::
 
     import click
     from scrim import get_scrim
@@ -65,15 +65,52 @@ Now that you're project has Scrim added to it let's take a look at the python si
 
     @click.command()
     def mytool():
-        if scrim.shell == 'powershell.exe':
-            scrim.append('$env:MYTOOL="Hello World!"')
-        elif scrim.shell == 'cmd.exe':
-            scrim.append('set MYTOOL="Hello World!"')
+        scrim.set_env('MYTOOL', "Hello World!")
 
     if __name__ == '__main__':
         mytool()
 
-We use `get_scrim` to get an instance of `Scrim`. Then we append commands to the scrim and those will be executed by the *Scrim script* that invokes the python cli after python exits. In this case the environment variable *MYTOOL* will be set to *Hello World!* in your shell.
+We use `get_scrim` to get an instance of `Scrim`. Then we append commands to the scrim and those will be written to a shell script when python exits. After python exits the *scrim script* will check to see if a shell script exists and execute it. In this case the environment variable *MYTOOL* will be set to *Hello World!*.
+
+
+Installing a library that uses Scrim
+====================================
+
+Windows
+-------
+A simple `pip install` will do you. The scrim scripts
+will be picked up normally from your command line, you won't even know they
+are there!
+
+Unix Systems
+------------
+In addition to your standard `pip install` you also have to source the scrim
+script after installation. It usually ends up in one of these locations:
+
+  - {virtualenv_path}/bin/{entry_point}.sh
+  - /usr/local/bin/{entry_point}.sh
+
+
+Supported Shells
+================
+
+  - bash
+  - cmd
+  - powershell
+
+
+To Do
+=====
+
+  - More tests...
+  - Support more shells: fish, csh, zsh...
+  - Add more commands to the `Scrim`
+  - Extend scrim cli to better support a variety of entry_points scenarios
+
+    - Currently we only capture `setup` entry_points when defined as a
+      dict.
+    - We also only support entry_points beginning with py.
+    - Parse setup.cfg in addition to setup.py
 
 
 Tests
@@ -82,29 +119,4 @@ Use nose to manually run the scrim test suite.
 
 ::
 
-    > nosetests -v
-
-
-The Future
-==========
-
-v0.1.0
-------
-
-  - Add support for bash, fish, and csh
-  - Extend scrim cli to better support a variety of entry_points scenarios
-  - Parse setup.cfg as well as setup.py to find all entry_points
-  - Add commands to the Scrim object that support each shell scripting language
-
-    - Scrim.echo for example would append a Write-Host call to the Scrim for powershell and echo for cmd and bash
-
-
-Known Issues
-------------
-
-Batch: On windows PATHEXT environment variable sets the priority of executables. By default .EXE is higher priorty than .BAT. This causes the python cli to get called rather than the Scrim Script. There are currently two solutions
-
-    - Modify PATHEXT so that .BAT appears before .EXE
-    - Prefix your python entry_point with py and modify the Scrim Scripts to call py{entry_point}.exe instead of just {entry_point}.exe
-
-I'm leaving this as is for now, and expand the scrim cli to support the 2nd solution.
+    > nosetests -v -s --with-doctest

@@ -45,7 +45,9 @@ setup(
     long_description=long_description,
     install_requires=[
         'click>=6.7',
-        'psutil>=5.2'
+        'psutil>=5.2',
+        'fstrings>=0.1.0',
+        'six>=1.10.0'
     ],
     packages=['scrim'],
     package_data={

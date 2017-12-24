@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
 import os
 from functools import partial
 import shutil
-import unittest
-from nose.tools import *
-from scrim import *
+from scrim import get_scrim, copy_templates
+from scrim.globals import *
 
 data_path = partial(os.path.join, os.path.dirname(__file__), '.testdata')
 
@@ -41,9 +42,9 @@ def test_get_scrim():
 def test_scrim():
     '''Test scrim.write'''
 
-    scrim = get_scrim(data_path('.scrim'))
-    scrim.append('line 01')
-    scrim.append('line 02')
+    scrim = get_scrim(data_path('.scrim'), shell='cmd.exe')
+    scrim.raw('line 01', scrim.shell)
+    scrim.raw('line 02', scrim.shell)
     scrim.write()
 
     assert os.path.exists(scrim.path)
@@ -53,16 +54,13 @@ def test_scrim():
 
     assert scrim.to_string() == text
 
-    expected_repr = 'Scrim({}, 0, None, None)'.format(data_path('.scrim'))
-    assert repr(scrim) == expected_repr
-
     scrim = get_scrim(
         path=data_path('.scrim2'),
         auto_write=False,
-        shell='fake',
-        script='fake.script'
+        shell='cmd.exe',
+        script='null'
     )
-    scrim.append('Hello')
+    scrim.raw('Hello', scrim.shell)
     scrim.on_exit()
     assert not os.path.exists(scrim.path)
 
@@ -75,5 +73,5 @@ def test_scrim():
 def test_copy_templates():
     '''Test scrim.utils.copy_templates'''
 
-    scripts = copy_templates('test', True, data_path('bin'))
+    scripts = copy_templates('test', 'pytest', True, data_path('bin'))
     assert all([os.path.exists(s) for s in scripts])

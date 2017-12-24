@@ -1,0 +1,2 @@
+click>=6.7
+fstrings>=0.1.0
